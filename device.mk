@@ -299,12 +299,14 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     libnfc-nci \
-    libnfc_nci_jni \
-    nfc_nci.msm8916 \
     NfcNci \
     Tag \
-    com.android.nfc_extras \
-    com.android.nfc.helper
+    com.android.nfc_extras
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/nfc/libnfc-sec.conf:system/etc/libnfc-brcm.conf \
+    $(LOCAL_PATH)/nfc/libnfc-sec-hal.conf:system/etc/libnfc-sec-hal.conf \
+    $(LOCAL_PATH)/nfc/nfcee_access.xml:system/etc/nfcee_access.xml
 
 PRODUCT_COPY_FILES += \
     packages/apps/Nfc/migrate_nfc.txt:system/etc/updatecmds/migrate_nfc.txt \
