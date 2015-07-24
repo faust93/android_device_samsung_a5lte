@@ -49,9 +49,8 @@ TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=23 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci androidboot.selinux=permissive
 BOARD_KERNEL_PAGESIZE := 2048
-BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --dt device/samsung/a5lte/dt.img --tags_offset 0x00000100
+BOARD_MKBOOTIMG_ARGS := --dt device/samsung/a5lte/dt.img
 BOARD_KERNEL_SEPARATED_DT := true
-BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 TARGET_PREBUILT_KERNEL := device/samsung/a5lte/kernel
 
 #TARGET_KERNEL_SOURCE := kernel/samsung/msm8916
@@ -64,13 +63,6 @@ TARGET_PREBUILT_KERNEL := device/samsung/a5lte/kernel
 BOARD_RIL_CLASS := ../../../device/samsung/a5lte/ril/SamsungA5FRIL.java
 
 # Audio
-#BOARD_USES_ALSA_AUDIO := true
-#TARGET_QCOM_AUDIO_VARIANT := caf
-#AUDIO_FEATURE_MDM_DETECT := true
-#AUDIO_FEATURE_ENABLED_FLAC_OFFLOAD := true
-#TARGET_USES_QCOM_MM_AUDIO := true
-
-# Audio
 BOARD_USES_ALSA_AUDIO := true
 AUDIO_FEATURE_MDM_DETECT := true
 AUDIO_FEATURE_ENABLED_FLAC_OFFLOAD := true
@@ -80,7 +72,6 @@ TARGET_USES_QCOM_MM_AUDIO := true
 AUDIO_FEATURE_ENABLED_INCALL_MUSIC := true
 AUDIO_FEATURE_ENABLED_MULTIPLE_TUNNEL := true
 AUDIO_FEATURE_ENABLED_PROXY_DEVICE := true
-
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
@@ -104,6 +95,8 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 
 # Enables CSVT
 TARGET_USES_CSVT := true
+
+TARGET_USES_LOGD := true
 
 # Flags
 COMMON_GLOBAL_CFLAGS += -D_ION_HEAP_MASK_COMPATIBILITY_WA
@@ -175,6 +168,7 @@ PROTOBUF_SUPPORTED := true
 HAVE_SYNAPTICS_I2C_RMI4_FW_UPGRADE := true
 
 # Power
+TARGET_POWERHAL_SET_INTERACTIVE_EXT := $(LOCAL_PATH)/power/power_ext.c
 TARGET_POWERHAL_VARIANT := qcom
 
 #charger
