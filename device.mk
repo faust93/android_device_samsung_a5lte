@@ -148,17 +148,16 @@ PRODUCT_PACKAGES += \
     libtinyxml
 
 PRODUCT_PACKAGES += \
-    audio.msm8916 \
-    audio_policy.msm8916
+    audio.msm8916
 
 PRODUCT_PACKAGES += \
     audiod \
-    audio.primary.msm8916 \
     audio.a2dp.default \
     audio.usb.default \
     audio.r_submix.default \
     libaudio-resampler \
     tinymix \
+    libtinycompress \
     libqcomvisualizer \
     libqcomvoiceprocessing
 
@@ -219,6 +218,9 @@ PRODUCT_PACKAGES += \
     libstagefrighthw \
     libdashplayer \
     qcmediaplayer
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/audio/libaudioroute.so:system/lib/libaudioroute.so
 
 # Bson
 PRODUCT_PACKAGES += \
@@ -303,6 +305,10 @@ PRODUCT_PACKAGES += \
     Tag \
     com.android.nfc_extras
 
+# Power HAL
+PRODUCT_PACKAGES += \
+    power.msm8916
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/nfc/libnfc-sec.conf:system/etc/libnfc-brcm.conf \
     $(LOCAL_PATH)/nfc/libnfc-sec-hal.conf:system/etc/libnfc-sec-hal.conf \
@@ -355,18 +361,4 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sf.lcd_density=320
-
-#PRODUCT_PROPERTY_OVERRIDES += \
-#    persist.sys.logkit.ctrlcode=0 \
-#    persist.sys.qc.sub.rdump.max=3 \
-#    mdc_initial_max_retry=10 \
-#    drm.service.enabled=true \
-#    ro.media.enc.aud.fileformat=amr \
-#    ro.media.enc.aud.codec=amrnb \
-#    ro.gps.agps_provider=1
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    dalvik.vm.heapgrowthlimit=128m \
-    dalvik.vm.heapminfree=6m \
-    dalvik.vm.heapstartsize=14m 
 
