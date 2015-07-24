@@ -3,7 +3,8 @@
 ro.sf.lcd_density=320
 
 # RIL
-rild.libpath=/system/vendor/lib/libril-qc-qmi-1.so
+#rild.libpath=/system/vendor/lib/libril-qc-qmi-1.so
+rild.libpath=/system/lib/libsec-ril.so
 rild.libargs=-d /dev/smd0
 ro.telephony.ril_class=SamsungA5FRIL
 persist.rild.nitz_plmn=
@@ -25,7 +26,6 @@ debug.egl.hw=1
 debug.composition.type=c2d
 persist.hwc.mdpcomp.enable=true
 debug.mdpcomp.logs=0
-dalvik.vm.heapsize=36m
 dev.pm.dyn_samplingrate=1
 persist.demo.hdmirotationlock=false
 
@@ -134,18 +134,18 @@ persist.debug.wfd.enable=1
 persist.hwc.enable_vds=1
 
 # HWUI_BUILD_PROPERTIES
-ro.hwui.texture_cache_size=24
-ro.hwui.layer_cache_size=16
-ro.hwui.path_cache_size=4
-ro.hwui.shape_cache_size=1
-ro.hwui.gradient_cache_size=0.5
-ro.hwui.drop_shadow_cache_size=2
-ro.hwui.r_buffer_cache_size=2
-ro.hwui.text_small_cache_width=1024
-ro.hwui.text_small_cache_height=512
-ro.hwui.text_large_cache_width=2048
-ro.hwui.text_large_cache_height=1024
-#ro.hwui.text_large_cache_height=2048
+#ro.hwui.texture_cache_size=24
+#ro.hwui.layer_cache_size=16
+#ro.hwui.path_cache_size=4
+#ro.hwui.shape_cache_size=1
+#ro.hwui.gradient_cache_size=0.5
+#ro.hwui.drop_shadow_cache_size=2
+#ro.hwui.r_buffer_cache_size=2
+#ro.hwui.text_small_cache_width=1024
+#ro.hwui.text_small_cache_height=512
+#ro.hwui.text_large_cache_width=2048
+#ro.hwui.text_large_cache_height=1024
+ro.hwui.text_large_cache_height=2048
 
 keyguard.no_require_sim=true
 ro.com.google.clientidbase=android-samsung
