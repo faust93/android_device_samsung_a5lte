@@ -23,7 +23,6 @@ import static com.android.internal.telephony.RILConstants.*;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.media.AudioManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
@@ -49,6 +48,7 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
 import android.util.SparseArray;
+import android.media.AudioManager;
 
 import com.android.internal.telephony.gsm.SmsBroadcastConfigInfo;
 import com.android.internal.telephony.gsm.SsData;
@@ -81,7 +81,7 @@ import java.util.Random;
 
 
 /**
- * RIL customization for Galaxy A5F Duos device
+ * RIL customization for Samsung A5/A3 devices
  *
  * {@hide}
  */
@@ -98,7 +98,6 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
     private static final int RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED_G7102 = 11031;
 
     private AudioManager mAudioManager;
- private Message mPendingGetSimStatus;
 
     public SamsungA5FRIL(Context context, int networkMode, int cdmaSubscription,Integer instanceId) {
         super(context, networkMode, cdmaSubscription,  instanceId);
@@ -121,11 +120,7 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
         rr.mParcel.writeInt(clirMode);
         rr.mParcel.writeInt(0);         // CallDetails.call_type
         rr.mParcel.writeInt(1);         // CallDetails.call_domain
-//        rr.mParcel.writeInt(0);         // CallDetails.call_domain
-
         rr.mParcel.writeString("");     // CallDetails.getCsvFromExtras
-
-        logParcel(rr.mParcel);
 
         if (uusInfo == null) {
             rr.mParcel.writeInt(0); // UUS information is absent
@@ -137,6 +132,18 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
         }
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        send(rr);
+    }
+
+    @Override
+    public void acceptCall(Message result) {
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_ANSWER, result);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        rr.mParcel.writeInt(1);
+        rr.mParcel.writeInt(0);
 
         send(rr);
     }
@@ -186,26 +193,12 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
     @Override
     protected Object
     responseCallList(Parcel p) {
-        int num,tm;
+        int num;
         int voiceSettings;
         ArrayList<DriverCall> response;
         DriverCall dc;
 
-        logParcel(p);
-
-        int dataAvail = p.dataAvail();
-        int pos = p.dataPosition();
-        int size = p.dataSize();
-
-        Rlog.d(RILJ_LOG_TAG, "Parcel size = " + size);
-        Rlog.d(RILJ_LOG_TAG, "Parcel pos = " + pos);
-        Rlog.d(RILJ_LOG_TAG, "Parcel dataAvail = " + dataAvail);
-
-        //Samsung changes
         num = p.readInt();
-
-        Rlog.d(RILJ_LOG_TAG, "num = " + num);
-
         response = new ArrayList<DriverCall>(num);
 
         if (RILJ_LOGV) {
@@ -214,8 +207,6 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
                     " mTestingEmergencyCall=" + mTestingEmergencyCall.get());
         }
         for (int i = 0 ; i < num ; i++) {
-
-
             dc = new DriverCall();
 
             dc.state = DriverCall.stateFromCLCC(p.readInt());
@@ -230,8 +221,7 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
             boolean isVideo = (0 != p.readInt());
             int call_type = p.readInt();            // Samsung CallDetails
             int call_domain = p.readInt();          // Samsung CallDetails
-	    p.readInt();
-//            String csv = p.readString();            // Samsung CallDetails
+            p.readInt();            // Samsung CallDetails
             dc.isVoicePrivacy = (0 != p.readInt());
             dc.number = p.readString();
             int np = p.readInt();
@@ -239,20 +229,6 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
             dc.name = p.readString();
             dc.namePresentation = p.readInt();
             int uusInfoPresent = p.readInt();
-
-            Rlog.d(RILJ_LOG_TAG, "state = " + dc.state);
-            Rlog.d(RILJ_LOG_TAG, "index = " + dc.index);
-            Rlog.d(RILJ_LOG_TAG, "state = " + dc.TOA);
-            Rlog.d(RILJ_LOG_TAG, "isMpty = " + dc.isMpty);
-            Rlog.d(RILJ_LOG_TAG, "isMT = " + dc.isMT);
-            Rlog.d(RILJ_LOG_TAG, "als = " + dc.als);
-            Rlog.d(RILJ_LOG_TAG, "isVoice = " + dc.isVoice);
-            Rlog.d(RILJ_LOG_TAG, "number = " + dc.number);
-            Rlog.d(RILJ_LOG_TAG, "np = " + np);
-            Rlog.d(RILJ_LOG_TAG, "name = " + dc.name);
-            Rlog.d(RILJ_LOG_TAG, "namePresentation = " + dc.namePresentation);
-            Rlog.d(RILJ_LOG_TAG, "uusInfoPresent = " + uusInfoPresent);
-
             if (uusInfoPresent == 1) {
                 dc.uusInfo = new UUSInfo();
                 dc.uusInfo.setType(p.readInt());
@@ -396,17 +372,6 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
         int newResponse = response;
         
         switch(response) {
-	    case RIL_UNSOL_RIL_CONNECTED: // Fix for NV/RUIM setting on CDMA SIM devices
-                // skip getcdmascriptionsource as if qualcomm handles it in the ril binary
-                ret = responseInts(p);
-                setRadioPower(false, null);
-                setPreferredNetworkType(mPreferredNetworkType, null);
-                setCdmaSubscriptionSource(mCdmaSubscription, null);
-                if(mRilVersion >= 8)
-                    setCellInfoListRate(Integer.MAX_VALUE, null);
-                notifyRegistrantsRilConnectionChanged(((int[])ret)[0]);
-                break;
-                
             case RIL_UNSOL_RESPONSE_IMS_NETWORK_STATE_CHANGED:
                 ret = responseVoid(p);
                 break;
@@ -415,6 +380,27 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
                 break;
             case RIL_UNSOL_AM:
                 ret = responseString(p);
+                break;
+            case RIL_UNSOL_WB_AMR_STATE:
+                ret = responseInts(p);
+                setWbAmr(((int[])ret)[0]);
+                break;
+            case RIL_UNSOL_RESPONSE_HANDOVER:
+                ret = responseVoid(p);
+                break;
+            case 1040:
+                newResponse = RIL_UNSOL_ON_SS;
+                break;
+            case 1041:
+                newResponse = RIL_UNSOL_STK_CC_ALPHA_NOTIFY;
+                break;
+            case 11031:
+                newResponse = RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED;
+                break;
+             }
+
+        switch (response) {
+              case RIL_UNSOL_AM:
                 samsungUnsljLogRet(response, ret);
                 String amString = (String) ret;
                 Rlog.d(RILJ_LOG_TAG, "Executing AM: " + amString);
@@ -426,113 +412,18 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
                     Rlog.e(RILJ_LOG_TAG, "am " + amString + " could not be executed.");
                 }
                 break;
-            case RIL_UNSOL_WB_AMR_STATE:
-                ret = responseInts(p);
-                setWbAmr(((int[])ret)[0]);
-                break;
-            case RIL_UNSOL_RESPONSE_HANDOVER:
-                ret = responseVoid(p);
-                break;
-            case 1040:
-                newResponse = RIL_UNSOL_ON_SS;
-                  p.setDataPosition(dataPosition);
-                  p.writeInt(newResponse);
-    		super.processUnsolicited(p);
-                break;
-            case 1041:
-                newResponse = RIL_UNSOL_STK_CC_ALPHA_NOTIFY;
-                  p.setDataPosition(dataPosition);
-                  p.writeInt(newResponse);
-    		super.processUnsolicited(p);
-                break;
-            case 11031:
-                newResponse = RIL_UNSOL_UICC_SUBSCRIPTION_STATUS_CHANGED;
-                  p.setDataPosition(dataPosition);
-                  p.writeInt(newResponse);
-    		super.processUnsolicited(p);
-            case 11032:
-                ret = responseVoid(p);
-                break;
 
 	    default:
-                p.setDataPosition(dataPosition);
-                super.processUnsolicited(p);
+             if (newResponse != response) {
+                  p.setDataPosition(dataPosition);
+                  p.writeInt(newResponse);
+            }
+	        p.setDataPosition(dataPosition);
+    		super.processUnsolicited(p);
     		return;
-        }
+	}
     }
 
-
-   //@Override
-    public void etUiccSubscription(int slotId, int appIndex, int subId,
-            int subStatus, Message result) {
-        //Note: This RIL request is also valid for SIM and RUIM (ICC card)
-        RILRequest rr = RILRequest.obtain(115, result);
-
-        riljLog(rr.serialString() + "MYRILJ> " + requestToString(rr.mRequest)
-                + " slot: " + slotId + " appIndex: " + appIndex
-                + " subId: " + subId + " subStatus: " + subStatus);
-
-        rr.mParcel.writeInt(slotId);
-        rr.mParcel.writeInt(appIndex);
-        rr.mParcel.writeInt(subId);
-        rr.mParcel.writeInt(subStatus);
-
-        send(rr);
-    }
-
-   @Override
-    public void setDataAllowed(boolean allowed, Message result) {
-	int req = 123;
-        RILRequest rr;
-	if (allowed)
-        {
-            req = 116;
-            rr = RILRequest.obtain(req, result);
-        }
-        else
-        {
-            rr = RILRequest.obtain(req, result);
-            rr.mParcel.writeInt(1);
-            rr.mParcel.writeInt(allowed ? 1 : 0);
-        }
-        send(rr);
-    }
-
-@Override
-    public void
-    getIccCardStatus(Message result) {
-        if (mState != RadioState.RADIO_ON) {
-            mPendingGetSimStatus = result;
-        } else {
-            super.getIccCardStatus(result);
-        }
-    }
-
-    @Override
-    protected void switchToRadioState(RadioState newState) {
-        super.switchToRadioState(newState);
-
-        if (newState == RadioState.RADIO_ON && mPendingGetSimStatus != null) {
-            super.getIccCardStatus(mPendingGetSimStatus);
-            mPendingGetSimStatus = null;
-        }
-    }
-
-
- public void
-    getDataCallProfile(int appType, Message result) {
-        RILRequest rr = RILRequest.obtain(
-                RIL_REQUEST_GET_DATA_CALL_PROFILE, result);
-
-        // count of ints
-        rr.mParcel.writeInt(1);
-        rr.mParcel.writeInt(appType);
-
-        if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest)
-                + " : " + appType);
-
-        send(rr);
-    }
 
     private void
     dialEmergencyCall(String address, int clirMode, Message result) {
@@ -561,7 +452,7 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
             if (i == p.dataPosition()) s.append("*** ");
             s.append(bytes[i]);
         }
-        riljLog("MYRILJ parcel position=" + p.dataPosition() + ": " + s);
+        riljLog("parcel position=" + p.dataPosition() + ": " + s);
     }
 
     static String
@@ -587,4 +478,5 @@ public class SamsungA5FRIL extends RIL implements CommandsInterface {
             mAudioManager.setParameters("wb_amr=off");
         }
     }
+
 }
