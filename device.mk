@@ -159,6 +159,7 @@ PRODUCT_PACKAGES += \
     tinymix \
     libtinycompress \
     libqcomvisualizer \
+    libqcompostprocbundle \
     libqcomvoiceprocessing
 
 # Ebtables
@@ -291,13 +292,13 @@ PRODUCT_PACKAGES += \
 
 # Wifi
 PRODUCT_PACKAGES += \
-    hostapd.accept \
-    hostapd_default.conf \
-    hostapd.deny \
     hostapd \
     wpa_supplicant \
     wpa_supplicant.conf \
     dhcpcd.conf
+#    hostapd.accept \
+#    hostapd_default.conf \
+#    hostapd.deny \
 
 PRODUCT_PACKAGES += \
     libnfc-nci \
@@ -323,7 +324,9 @@ PRODUCT_COPY_FILES += \
 # Keylayouts
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
-    $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl
+    $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl \
+    $(LOCAL_PATH)/keylayout/Synaptics_RMI4_TouchPad_Sensor.idc:system/usr/idc/Synaptics_RMI4_TouchPad_Sensor.idc \
+    $(LOCAL_PATH)/keylayout/Synaptics_HID_TouchPad.idc:system/usr/idc/Synaptics_HID_TouchPad.idc
 
 # Chromium
 PRODUCT_PACKAGES += \
@@ -360,5 +363,9 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/grippower.info:system/etc/wifi/grippower.info
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=320
+    ro.sf.lcd_density=300 \
+    ro.nfc.sec_hal=true \
+    ro.multisim.samsung=true
 
+$(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
+$(call inherit-product, build/target/product/full.mk)

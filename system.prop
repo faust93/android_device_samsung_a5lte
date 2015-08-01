@@ -73,6 +73,9 @@ ro.opengles.version=196608
 # System property for cabl
 ro.qualcomm.cabl=0
 
+# SEC NFC
+ro.nfc.sec_hal=true
+
 # System props for bluetooth
 # System prop to turn on hfp client
 bluetooth.hfp.client=1

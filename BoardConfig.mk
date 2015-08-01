@@ -144,7 +144,7 @@ TARGET_OTA_ASSERT_DEVICE := a5,a5lte,a5ltexx
 TARGET_PROVIDES_LIBLIGHT := true
 
 # Crypto
-#TARGET_HW_DISK_ENCRYPTION := true
+TARGET_HW_DISK_ENCRYPTION := true
 
 # Media
 TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
@@ -261,3 +261,12 @@ PRODUCT_COPY_FILES += device/samsung/a5lte/twrp.fstab:recovery/root/etc/twrp.fst
 
 # inherit from the proprietary version
 -include vendor/cyanogen/msm8916-common/BoardConfigVendor.mk
+
+# Enable dex-preoptimization to speed up first boot sequence
+ifeq ($(HOST_OS),linux)
+  ifeq ($(TARGET_BUILD_VARIANT),user)
+    ifeq ($(WITH_DEXPREOPT),)
+      WITH_DEXPREOPT := true
+    endif
+  endif
+endif

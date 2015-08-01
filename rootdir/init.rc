@@ -484,26 +484,16 @@ on post-fs-data
     #setprop vold.post_fs_data_done 1
 	
 # Separate location for storing security policy files on data    
-#start SEC_PRODUCT_FEATURE_COMMON_SUPPORT_SE_FOR_ANDROID 
     mkdir /data/security 0700 system system
-#end SEC_PRODUCT_FEATURE_COMMON_SUPPORT_SE_FOR_ANDROID 
 
 	# Reload policy from /data/security if present.
 #	setprop selinux.reload_policy 1
-
-# Downloadable Filter
-    mkdir /data/DownFilters       0775 system system
-    mkdir /data/DownFilters/Lib   0775 system system
-    mkdir /data/DownFilters/Lib64 0775 system system
 
     #SideSync
     chown system system /dev/android_ssusbcon
     chmod 0660 /dev/android_ssusbcon
 
 on boot
-# KNOX KAP
-    chown system system /dev/knox_kap
-    chmod 0660 /dev/knox_kap
 
 # Mobicore
     mkdir /data/app/mcRegistry 0775 system system
@@ -883,7 +873,7 @@ service sysmon /system/bin/sysmon
 service ueventd /sbin/ueventd
     class core
     critical
-    seclabel u:r:ueventd:s0
+#    seclabel u:r:ueventd:s0
 
 service logd /system/bin/logd
     class core
@@ -913,7 +903,7 @@ service console /system/bin/sh
     disabled
     user shell
     group shell log
-    seclabel u:r:shell:s0
+#    seclabel u:r:shell:s0
 
 ## WTL_EDM_START
 ## EDM AuditLog
@@ -922,22 +912,6 @@ service edmaudit /system/bin/edmaudit
     user root
     
 ## WTL_EDM_END
-
-service kap_enable /sbin/knox_changer -e
-    class main
-    disabled
-    oneshot
-
-service kap_disable /sbin/knox_changer -d
-    class main
-    disabled
-    oneshot
-
-on property:security.knox_kap_mode=true
-    start kap_enable
-
-on property:security.knox_kap_mode=false
-    start kap_disable
 
 # SEC_SELINUX
 service auditd /system/bin/auditd -k
@@ -956,7 +930,7 @@ service prepare_param /system/bin/prepare_param.sh /dev/block/platform/7824900.s
     class core
     user root
     group root
-    seclabel u:r:prepare_param:s0
+#    seclabel u:r:prepare_param:s0
     oneshot
 
 on property:ro.debuggable=1
@@ -965,7 +939,7 @@ on property:ro.debuggable=1
 # SEC_SELINUX
 on property:selinux.reload_policy=1
     chown system system /sys/fs/selinux/enforce
-	chown -R system system /sys/fs/selinux/booleans
+    chown -R system system /sys/fs/selinux/booleans
     chown system system /sys/fs/selinux/commit_pending_bools
 
 # SEC_SELINUX to support spota
@@ -981,7 +955,7 @@ service adbd /sbin/adbd --root_seclabel=u:r:su:s0
     class core
     socket adbd stream 660 system system
     disabled
-    seclabel u:r:adbd:s0
+#    seclabel u:r:adbd:s0
 
 # adbd on at boot in emulator
 on property:ro.kernel.qemu=1
@@ -1016,9 +990,7 @@ service vold /system/bin/vold
     class core
     socket vold stream 0660 root mount
     ioprio be 2
-## Samsung ODE >>>
     socket dir_enc_report stream 0660 root mount
-## Samsung ODE <<<
 
 service epmd /system/bin/epmd
     class main
@@ -1034,9 +1006,6 @@ service netd /system/bin/netd
     socket fwmarkd stream 0660 root inet
 
 service debuggerd /system/bin/debuggerd
-    class main
-
-service debuggerd64 /system/bin/debuggerd64
     class main
 
 # icd
@@ -1069,12 +1038,7 @@ service surfaceflinger /system/bin/surfaceflinger
 service drm /system/bin/drmserver
     class main
     user drm
-# [ SEC_MM_DRM
-# fix
     group system drm inet drmrpc radio
-# org
-#    group drm system inet drmrpc
-# ]
 
 service media /system/bin/mediaserver
     class main
@@ -1096,12 +1060,6 @@ service encrypt /system/bin/vdc --wait cryptfs enablecrypto inplace default
     # vold will set vold.decrypt to trigger_restart_framework (default
     # encryption)
 
-service powersnd /system/bin/samsungpowersoundplay
-    class main
-    user media
-    group system
-    disabled
-    oneshot
 
 service bootanim /system/bin/bootanimation
     class main
@@ -1293,12 +1251,6 @@ service BCS-daemon /system/bin/connfwexe
     user root
     group system radio inet net_raw
 
-# Kies
-    service mobex-daemon /system/bin/npsmobex
-    class main
-    user system
-    group system radio inet sdcard_r sdcard_rw media_rw shell
-
 service sysprof /system/bin/sysprof -f /data/local/tmp/.sysprofctrl -o /data/local/tmp/.sysprofreport -c /data/local/tmp/sysprofconf
     class main
     user root
@@ -1312,14 +1264,4 @@ on property:sys.boot_completed=1
 on property:init.svc.media=restarting
     check_icd
     start icd
-
-service vpnclientd /system/bin/vpnclientd
-	socket vpnclientd seqpacket 0600 system system
-	user system
-	group system net_admin inet net_raw
-	disabled
-on property:service.vpnclientd.enable=1
-	start vpnclientd
-on property:service.vpnclientd.enable=0
-	stop vpnclientd
 

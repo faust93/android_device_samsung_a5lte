@@ -109,6 +109,8 @@ ___________________________________________________
   |____________________________________________________|
 -->
 <MediaCodecs>
+    <Include href="media_codecs_google_audio.xml" />
+    <Include href="media_codecs_google_telephony.xml" />
     <Encoders>
         <!-- Video Hardware  -->
         <MediaCodec name="OMX.qcom.video.encoder.mpeg4" type="video/mp4v-es" >
@@ -279,7 +281,5 @@ ___________________________________________________
         </MediaCodec>
     </Decoders>
     <Include href="media_codecs_google_video.xml" />
-    <Include href="media_codecs_google_audio.xml" />
-    <Include href="media_codecs_google_telephony.xml" />
     <Include href="media_codecs_ffmpeg.xml" />
 </MediaCodecs>
