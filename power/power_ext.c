@@ -21,8 +21,8 @@
 #define LOG_TAG "PowerHAL_A5_Ext"
 #include <utils/Log.h>
 
-#define TOUCHKEY_POWER "/sys/class/input/input1/enabled"
-#define TOUCHSCREEN_POWER "/sys/class/input/input3/enabled"
+#define TOUCHKEY_POWER "/sys/class/input/event1/device/enabled"
+#define TOUCHSCREEN_POWER "/sys/class/input/event3/device/enabled"
 #define LCD_POWER "/sys/class/power_supply/battery/lcd"
 
 static void sysfs_write(char *path, char *s) {
@@ -48,6 +48,5 @@ static void sysfs_write(char *path, char *s) {
 void cm_power_set_interactive_ext(int on) {
     ALOGD("%s: %s input devices", __func__, on ? "enabling" : "disabling");
     sysfs_write(LCD_POWER, on ? "1" : "0");
-    sysfs_write(TOUCHKEY_POWER, on ? "1" : "0");
-    sysfs_write(TOUCHSCREEN_POWER, on ? "1" : "0");
+
 }

@@ -1,5 +1,7 @@
+lib/librs_adreno_sha1.so
+lib/librs_adreno.so
+lib/libRSDriver_adreno.so
 lib/libaudio-ril.so
-lib/libcutils.so
 lib/libarcsoft_wideselfie.so
 lib/libsecface.so
 lib/libarcsoft_panorama_burstcapture.so

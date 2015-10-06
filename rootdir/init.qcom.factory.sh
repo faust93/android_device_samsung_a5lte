@@ -151,7 +151,7 @@ export PATH=/system/bin:/system/xbin
     chown -h system.system /sys/power/wakeup_count
     chown -h radio.system /sys/power/wake_lock
     chown -h radio.system /sys/power/wake_unlock
-    chmod -h 0660 /sys/power/state
+    chmod -h 0666 /sys/power/state
     chmod -h 0660 /sys/power/wake_lock
     chmod -h 0660 /sys/power/wake_unlock
 

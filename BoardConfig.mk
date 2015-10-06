@@ -44,19 +44,22 @@ TARGET_CPU_SMP := true
 ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 
-# UsingpPrebuilt kernel temporarily
-#BOARD_CUSTOM_BOOTIMG_MK := $(LOCAL_PATH)/mkbootimg.mk
+BOARD_CUSTOM_BOOTIMG_MK := $(LOCAL_PATH)/mkbootimg.mk
 BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=23 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci
 BOARD_KERNEL_PAGESIZE := 2048
-BOARD_MKBOOTIMG_ARGS := --dt device/samsung/a5lte/dt.img
 BOARD_KERNEL_SEPARATED_DT := true
-TARGET_PREBUILT_KERNEL := device/samsung/a5lte/kernel
+BOARD_KERNEL_TAGS_OFFSET=0x01E00000
 
-#TARGET_KERNEL_SOURCE := kernel/samsung/msm8916
-#TARGET_KERNEL_CONFIG := msm8916_sec_defconfig
-#TARGET_KERNEL_VARIANT_CONFIG := msm8916_sec_a5_eur_defconfig
-#TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
+# UsingpPrebuilt kernel temporarily
+#BOARD_MKBOOTIMG_ARGS := --dt device/samsung/a5lte/dt.img
+#TARGET_PREBUILT_KERNEL := device/samsung/a5lte/kernel
+
+TARGET_KERNEL_SOURCE := kernel/samsung/f93_a5f
+TARGET_KERNEL_CONFIG := msm8916_sec_defconfig
+TARGET_KERNEL_VARIANT_CONFIG := f93_a5_defconfig
+#msm8916_sec_a5_eur_defconfig
+TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
 
 # RIL
 #BOARD_PROVIDES_LIBRIL := true
@@ -108,7 +111,7 @@ endif
 
 # Graphics
 TARGET_HARDWARE_3D := false
-#OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
+OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 BOARD_EGL_CFG := $(LOCAL_PATH)/egl.cfg
@@ -121,7 +124,7 @@ USE_OPENGL_RENDERER := true
 TARGET_CONTINUOUS_SPLASH_ENABLED := true
 
 # Hardware
-#BOARD_HARDWARE_CLASS := device/samsung/a5lte/cmhw
+BOARD_HARDWARE_CLASS := device/samsung/a5lte/cmhw
 
 # Init
 #TARGET_UNIFIED_DEVICE := true
@@ -261,6 +264,12 @@ PRODUCT_COPY_FILES += device/samsung/a5lte/twrp.fstab:recovery/root/etc/twrp.fst
 
 # inherit from the proprietary version
 -include vendor/cyanogen/msm8916-common/BoardConfigVendor.mk
+
+TARGET_TC_ROM := 4.9
+TARGET_TC_KERNEL := 4.9
+#TARGET_GCC_VERSION_EXP := $(TARGET_TC_ROM)
+TARGET_KERNEL_CUSTOM_TOOLCHAIN := $(TARGET_TC_KERNEL)
+WITH_LZMA_OTA := true
 
 # Enable dex-preoptimization to speed up first boot sequence
 ifeq ($(HOST_OS),linux)

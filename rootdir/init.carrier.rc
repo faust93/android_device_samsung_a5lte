@@ -150,5 +150,5 @@ service swapon /sbin/sswap -s
     class core
     user root
     group root
-#    seclabel u:r:sswap:s0
+    seclabel u:r:sswap:s0
     oneshot

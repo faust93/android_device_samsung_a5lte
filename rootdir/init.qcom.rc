@@ -64,9 +64,9 @@ on init
     symlink /storage/sdcard1 /mnt/sdcard2
     symlink /storage/emulated/legacy /storage/sdcard0
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
+    symlink /mnt/shell/emulated/0 /storage/emulated/0
 
     # map "real" external storages paths also in same way. backwards compatibility.
-    symlink /storage/sdcard1 /mnt/sdcard1
     symlink /storage/UsbDriveA /mnt/UsbDriveA
     symlink /storage/UsbDriveB /mnt/UsbDriveB
     symlink /storage/UsbDriveC /mnt/UsbDriveC
@@ -112,6 +112,8 @@ on boot
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0666  /sys/class/input/input2/enabled
     chmod 0666  /sys/class/input/input0/enabled
+    chmod 0666 /sys/class/input/event3/device/enabled
+    chmod 0666 /sys/class/input/event1/device/enabled
 
     chmod 0660 /dev/ttyHS2
     chown bluetooth bluetooth /dev/ttyHS2
@@ -859,6 +861,9 @@ service usb_uicc_daemon /system/bin/usb_uicc_client
     group system log net_raw
     oneshot
 
+on property:hw.fm.mode=*
+    insmod /system/lib/modules/radio-iris-transport.ko
+
 on property:sys.usb_uicc.enabled=1
     start usb_uicc_enable
 
@@ -1030,7 +1035,7 @@ service msm_irqbalance /system/bin/msm_irqbalance -f /system/vendor/etc/msm_irqb
     class core
     user root
     group root
-#    disabled
+    disabled
 
 # Change IO scheduler to CFQ after boot_complete
 on property:sys.boot_completed=1

@@ -365,7 +365,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sf.lcd_density=300 \
     ro.nfc.sec_hal=true \
-    ro.multisim.samsung=true
+    ro.multisim.set_audio_params=true
+#    ro.multisim.samsung=true
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
 $(call inherit-product, build/target/product/full.mk)

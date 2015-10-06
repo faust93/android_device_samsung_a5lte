@@ -81,6 +81,11 @@ char const*const GREEN_DELAYOFF_FILE
 
 char const*const BLUE_DELAYOFF_FILE
         = "/sys/class/leds/white/delay_off";
+
+char const*const BLN_FILE
+        = "/sys/class/misc/backlightnotification/notification_led";
+
+
 /**
  * device methods
  */
@@ -242,6 +247,8 @@ set_light_notifications(struct light_device_t* dev,
     pthread_mutex_lock(&g_lock);
     g_notification = *state;
     handle_speaker_battery_locked(dev);
+    int on = is_lit(state);
+    write_int(BLN_FILE,on?1:0);
     pthread_mutex_unlock(&g_lock);
     return 0;
 }
